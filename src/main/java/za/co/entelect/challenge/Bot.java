@@ -48,8 +48,8 @@ public class Bot {
     public Command run() {
         //Mencari worm musuh terdekat
         Worm enemyWorm = getNearestWorm();
-        Worm secondWormInBBRadius = getNearestWormInRadius(enemyWorm, currentWorm.bananaBombs.damageRadius);
-        Worm secondWormInSBRadius = getNearestWormInRadius(enemyWorm, currentWorm.snowballs.freezeRadius);
+        Worm secondWormInBBRadius = getNearestWormInRadius(enemyWorm, 2);
+        Worm secondWormInSBRadius = getNearestWormInRadius(enemyWorm, 1);
 
         if (canBananaBombThem(enemyWorm) && secondWormInBBRadius != null){  //Jika bisa di bananabomb, maka langsung dibananabomb
             return new BananaBombCommand(enemyWorm.position.x, enemyWorm.position.y);
@@ -107,10 +107,10 @@ public class Bot {
         List<Integer> wormsRange = new ArrayList<>(); //Jarak worm musuh dengan current worm
         List<Worm> enemyWorms = new ArrayList<>(); //List worm musuh
         for (Worm enemyWorm : opponent.worms) {
-            if (enemyWorm.health > 0 && enemyWorm.id != w.id && euclideanDistance(w.position.x, w.position.y, enemyWorm.position.x, enemyWorm.position.y) <= radius) { 
+            if (enemyWorm.health > 0 && enemyWorm.id != w.id && euclideanDistance(w.position.x, w.position.y, enemyWorm.position.x, enemyWorm.position.y) <= radius) {
                 enemyWorms.add(enemyWorm);
                 wormsRange.add(euclideanDistance(w.position.x, w.position.y, enemyWorm.position.x, enemyWorm.position.y));
-                
+
             }
         }
         if (!enemyWorms.isEmpty()) {
@@ -118,6 +118,7 @@ public class Bot {
         } else {
             return null;
         }
+    }
 
     private List<Worm> getWormsInRange(){
         //JANGAN DIPAHAMI, INI BELUM BISA DIPAKAI
