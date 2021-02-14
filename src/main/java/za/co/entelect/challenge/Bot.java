@@ -14,12 +14,14 @@ public class Bot {
     private GameState gameState;
     private Opponent opponent;
     private MyWorm currentWorm;
+    private List<Worm> targets;
 
     public Bot(Random random, GameState gameState) {
         this.random = random;
         this.gameState = gameState;
         this.opponent = gameState.opponents[0];
         this.currentWorm = getCurrentWorm(gameState);
+        this.targets = designate_target();
     }
 
     private MyWorm getCurrentWorm(GameState gameState) {
@@ -45,32 +47,60 @@ public class Bot {
         return (currentWorm.snowballs.count>0 && euclideanDistance(target.position.x, target.position.y, currentWorm.position.x, currentWorm.position.y) <= currentWorm.snowballs.range && euclideanDistance(target.position.x, target.position.y, currentWorm.position.x, currentWorm.position.y) > currentWorm.snowballs.freezeRadius * Math.sqrt(2) && target.roundsUntilUnfrozen<=0);
     }
 
+    private List<Worm> designate_target(){
+        List<Integer> wormsRange = new ArrayList<>(); //Jarak worm musuh dengan current worm
+        List<Worm> enemyWorms = new ArrayList<>(); //List worm musuh
+        for (Worm enemyWorm : opponent.worms) {
+            enemyWorms.add(enemyWorm);
+            wormsRange.add(euclideanDistance(16, 16, enemyWorm.position.x, enemyWorm.position.y));
+        }
+        List<Worm> targets = new ArrayList<>(); //make array of sorted enemies based on shortest distance to center
+        while (enemyWorms.size()!=0){
+            targets.add(enemyWorms.get(wormsRange.indexOf(Collections.min(wormsRange))));
+            enemyWorms.remove(wormsRange.indexOf(Collections.min(wormsRange)));
+            wormsRange.remove((wormsRange.indexOf(Collections.min(wormsRange))));
+        }
+        return targets;
+    }
+
     public Command run() {
         //Mencari worm musuh terdekat
-        Worm enemyWorm = getNearestWorm();
+        /*Worm enemyWorm = getNearestWorm();
         Worm secondWormInBBRadius = getNearestWormInRadius(enemyWorm, 2);
-        Worm secondWormInSBRadius = getNearestWormInRadius(enemyWorm, 1);
+        Worm secondWormInSBRadius = getNearestWormInRadius(enemyWorm, 1);*/
+        for (int i = 0; i < targets.size(); i++){
+            if (targets.get(i).health <= 0){
+                targets.remove(i);
+            }
+        }
 
-        if (canBananaBombThem(enemyWorm) && secondWormInBBRadius != null){  //Jika bisa di bananabomb, maka langsung dibananabomb
+        for (int i = 0; i < targets.size(); i++){
+            Worm enemyWorm = targets.get(i);
+            Worm secondWormInBBRadius = getNearestWormInRadius(enemyWorm, 2);
+            Worm secondWormInSBRadius = getNearestWormInRadius(enemyWorm, 1);
+            if (canBananaBombThem(enemyWorm) && secondWormInBBRadius != null){  //Jika bisa di bananabomb, maka langsung dibananabomb
             return new BananaBombCommand(enemyWorm.position.x, enemyWorm.position.y);
         }
-        if (canSnowballThem(enemyWorm) && secondWormInSBRadius != null){ //Jika bisa di snowball, maka langsung di snowbomb
+            if (canSnowballThem(enemyWorm) && secondWormInSBRadius != null){ //Jika bisa di snowball, maka langsung di snowbomb
             return new SnowballCommand(enemyWorm.position.x, enemyWorm.position.y);
         }
-        Worm enemyWormDefault = getFirstWormInRange(); //Ini mendetect worm musuh pakai fungsi bawaan, biar menghindari weird error
-        if (enemyWormDefault != null){ //Kalau ada musuh disekitar, maka bisa ditembak. Berlaku ke semua jenis worm/this is the default command
+    }
+            Worm enemyWormDefault = getFirstWormInRange(); //Ini mendetect worm musuh pakai fungsi bawaan, biar menghindari weird error
+            if (enemyWormDefault != null){ //Kalau ada musuh disekitar, maka bisa ditembak. Berlaku ke semua jenis worm/this is the default command
             Direction direction = resolveDirection(currentWorm.position, enemyWormDefault.position);
             return new ShootCommand(direction);
         }
         //Me list surrounding block, terus mencari block mana yg pathnya paling pendek
         List<Cell> surroundingBlocks = getSurroundingCells(currentWorm.position.x, currentWorm.position.y);
-        Cell block = findNextCellInPath(surroundingBlocks, enemyWorm.position.x, enemyWorm.position.y);
-        //Kalau ada dirt, dig. Kalau ngga, langsung jalan
-        if (block.type == CellType.AIR) {
+        for (int i = 0; i < targets.size(); i++){
+            Cell block = findNextCellInPath(surroundingBlocks, targets.get(i).position.x, targets.get(i).position.y);
+            //Kalau ada dirt, dig. Kalau ngga, langsung jalan
+            if (block.type == CellType.AIR) {
             return new MoveCommand(block.x, block.y);
-        } else if (block.type == CellType.DIRT) {
+        }   else if (block.type == CellType.DIRT) {
             return new DigCommand(block.x, block.y);
         }
+    }
         //Default
         return new DoNothingCommand();
 
