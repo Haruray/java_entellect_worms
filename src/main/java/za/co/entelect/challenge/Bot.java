@@ -48,17 +48,17 @@ public class Bot {
     }
 
     private List<Worm> designate_target(){
-        List<Integer> wormsRange = new ArrayList<>(); //Jarak worm musuh dengan current worm
+        List<Integer> wormsJob = new ArrayList<>(); 
         List<Worm> enemyWorms = new ArrayList<>(); //List worm musuh
         for (Worm enemyWorm : opponent.worms) {
             enemyWorms.add(enemyWorm);
-            wormsRange.add(euclideanDistance(16, 16, enemyWorm.position.x, enemyWorm.position.y));
+            wormsJob.add(enemyWorm.id);
         }
-        List<Worm> targets = new ArrayList<>(); //make array of sorted enemies based on shortest distance to center
+        List<Worm> targets = new ArrayList<>(); //make array of sorted enemies based on id
         while (enemyWorms.size()!=0){
-            targets.add(enemyWorms.get(wormsRange.indexOf(Collections.min(wormsRange))));
-            enemyWorms.remove(wormsRange.indexOf(Collections.min(wormsRange)));
-            wormsRange.remove((wormsRange.indexOf(Collections.min(wormsRange))));
+            targets.add(enemyWorms.get(wormsJob.indexOf(Collections.max(wormsJob))));
+            enemyWorms.remove(wormsJob.indexOf(Collections.max(wormsJob)));
+            wormsJob.remove((wormsJob.indexOf(Collections.max(wormsJob))));
         }
         return targets;
     }
