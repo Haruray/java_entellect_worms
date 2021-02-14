@@ -48,15 +48,17 @@ public class Bot {
     public Command run() {
         //Mencari worm musuh terdekat
         Worm enemyWorm = getNearestWorm();
+        Worm secondWormInBBRadius = getNearestWormInRadius(enemyWorm, currentWorm.bananaBombs.damageRadius);
+        Worm secondWormInSBRadius = getNearestWormInRadius(enemyWorm, currentWorm.snowballs.freezeRadius);
 
-        if (canBananaBombThem(enemyWorm)){  //Jika bisa di bananabomb, maka langsung dibananabomb
+        if (canBananaBombThem(enemyWorm) && secondWormInBBRadius != null){  //Jika bisa di bananabomb, maka langsung dibananabomb
             return new BananaBombCommand(enemyWorm.position.x, enemyWorm.position.y);
         }
-        if (canSnowballThem(enemyWorm)){//Jika bisa di snowball, maka langsung di snowbomb
+        if (canSnowballThem(enemyWorm) && secondWormInSBRadius != null){ //Jika bisa di snowball, maka langsung di snowbomb
             return new SnowballCommand(enemyWorm.position.x, enemyWorm.position.y);
         }
         Worm enemyWormDefault = getFirstWormInRange(); //Ini mendetect worm musuh pakai fungsi bawaan, biar menghindari weird error
-        if (enemyWormDefault!=null){ //Kalau ada musuh disekitar, maka bisa ditembak. Berlaku ke semua jenis worm/this is the default command
+        if (enemyWormDefault != null){ //Kalau ada musuh disekitar, maka bisa ditembak. Berlaku ke semua jenis worm/this is the default command
             Direction direction = resolveDirection(currentWorm.position, enemyWormDefault.position);
             return new ShootCommand(direction);
         }
@@ -99,6 +101,23 @@ public class Bot {
 
         return null;
     }
+
+    private Worm getNearestWormInRadius(Worm w, int radius) {
+        //get nearest worm
+        List<Integer> wormsRange = new ArrayList<>(); //Jarak worm musuh dengan current worm
+        List<Worm> enemyWorms = new ArrayList<>(); //List worm musuh
+        for (Worm enemyWorm : opponent.worms) {
+            if (enemyWorm.health > 0 && enemyWorm.id != w.id && euclideanDistance(w.position.x, w.position.y, enemyWorm.position.x, enemyWorm.position.y) <= radius) { 
+                enemyWorms.add(enemyWorm);
+                wormsRange.add(euclideanDistance(w.position.x, w.position.y, enemyWorm.position.x, enemyWorm.position.y));
+                
+            }
+        }
+        if (!enemyWorms.isEmpty()) {
+            return enemyWorms.get(wormsRange.indexOf(Collections.min(wormsRange)));
+        } else {
+            return null;
+        }
 
     private List<Worm> getWormsInRange(){
         //JANGAN DIPAHAMI, INI BELUM BISA DIPAKAI
