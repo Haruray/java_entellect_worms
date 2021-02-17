@@ -44,7 +44,20 @@ public class Bot {
         }
         return (currentWorm.snowballs.count>0 && euclideanDistance(target.position.x, target.position.y, currentWorm.position.x, currentWorm.position.y) <= currentWorm.snowballs.range && euclideanDistance(target.position.x, target.position.y, currentWorm.position.x, currentWorm.position.y) > currentWorm.snowballs.freezeRadius * Math.sqrt(2) && target.roundsUntilUnfrozen<=0);
     }
-
+    
+    private String createCommandShoot(Direction direction){
+        return String.format(";shoot %s", direction.name());
+    }
+    private String createCommandBananaBomb(int x, int y){
+        return String.format(";banana %d %d", x, y);
+    }
+    private String createCommandSnowball(int x, int y){
+        return String.format(";snowball %d %d", x, y);
+    }
+    //HOW TO USE SELECT COMMAND
+    //CONTOH :
+    //return new SelectCommand(wormID, createCommandShoot(direction);
+    
     public Command run() {
         //Mencari worm musuh terdekat
         Worm enemyWorm = getNearestWorm();
