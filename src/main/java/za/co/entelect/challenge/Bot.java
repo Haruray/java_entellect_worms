@@ -29,29 +29,29 @@ public class Bot {
                 .get();
     }
 
-    private boolean canBananaBombThem(Worm target){
-        //Check if currentWorm can cast bananabomb
-        if (currentWorm.id!=2){
+    private boolean canBananaBombThem(MyWorm playerWorm, Worm target){
+        //Check if playerWorm can cast bananabomb
+        if (playerWorm.id!=2){
             return false;
         }
-        return (currentWorm.bananaBombs.count>0 && euclideanDistance(target.position.x, target.position.y, currentWorm.position.x, currentWorm.position.y) <= currentWorm.bananaBombs.range && euclideanDistance(target.position.x, target.position.y, currentWorm.position.x, currentWorm.position.y) > currentWorm.bananaBombs.damageRadius * 0.75);
+        return (playerWorm.bananaBombs.count>0 && euclideanDistance(target.position.x, target.position.y, playerWorm.position.x, playerWorm.position.y) <= playerWorm.bananaBombs.range && euclideanDistance(target.position.x, target.position.y, playerWorm.position.x, playerWorm.position.y) > playerWorm.bananaBombs.damageRadius * 0.75);
     }
 
-    private boolean canSnowballThem(Worm target){
-        //Check if currentworm can cast snowball
-        if (currentWorm.id!=3){
+    private boolean canSnowballThem(MyWorm playerWorm, Worm target){
+        //Check if playerWorm can cast snowball
+        if (playerWorm.id!=3){
             return false;
         }
-        return (currentWorm.snowballs.count>0 && euclideanDistance(target.position.x, target.position.y, currentWorm.position.x, currentWorm.position.y) <= currentWorm.snowballs.range && euclideanDistance(target.position.x, target.position.y, currentWorm.position.x, currentWorm.position.y) > currentWorm.snowballs.freezeRadius * Math.sqrt(2) && target.roundsUntilUnfrozen<=0);
+        return (playerWorm.snowballs.count>0 && euclideanDistance(target.position.x, target.position.y, playerWorm.position.x, playerWorm.position.y) <= playerWorm.snowballs.range && euclideanDistance(target.position.x, target.position.y, playerWorm.position.x, playerWorm.position.y) > playerWorm.snowballs.freezeRadius * Math.sqrt(2) && target.roundsUntilUnfrozen<=0);
     }
     
-    private String createCommandShoot(Direction direction){
+    private String createCommandShoot(Direction direction) {
         return String.format(";shoot %s", direction.name());
     }
-    private String createCommandBananaBomb(int x, int y){
+    private String createCommandBananaBomb(int x, int y) {
         return String.format(";banana %d %d", x, y);
     }
-    private String createCommandSnowball(int x, int y){
+    private String createCommandSnowball(int x, int y) {
         return String.format(";snowball %d %d", x, y);
     }
     //HOW TO USE SELECT COMMAND
@@ -61,20 +61,30 @@ public class Bot {
     public Command run() {
         //Mencari worm musuh terdekat
         Worm enemyWorm = getNearestWorm();
-        Worm secondWormInBBRadius = getNearestWormInRadius(enemyWorm, 2);
-        Worm secondWormInSBRadius = getNearestWormInRadius(enemyWorm, 1);
 
-        if (canBananaBombThem(enemyWorm) && secondWormInBBRadius != null){  //Jika bisa di bananabomb, maka langsung dibananabomb
+        if (canBananaBombThem(currentWorm, enemyWorm)){  //Jika bisa di bananabomb, maka langsung dibananabomb
             return new BananaBombCommand(enemyWorm.position.x, enemyWorm.position.y);
         }
-        if (canSnowballThem(enemyWorm) && secondWormInSBRadius != null){ //Jika bisa di snowball, maka langsung di snowbomb
+        if (canSnowballThem(currentWorm, enemyWorm)){ //Jika bisa di snowball, maka langsung di snowbomb
             return new SnowballCommand(enemyWorm.position.x, enemyWorm.position.y);
         }
-        Worm enemyWormDefault = getFirstWormInRange(); //Ini mendetect worm musuh pakai fungsi bawaan, biar menghindari weird error
+        Worm enemyWormDefault = getFirstWormInRange(currentWorm); //Ini mendetect worm musuh pakai fungsi bawaan, biar menghindari weird error
         if (enemyWormDefault != null){ //Kalau ada musuh disekitar, maka bisa ditembak. Berlaku ke semua jenis worm/this is the default command
             Direction direction = resolveDirection(currentWorm.position, enemyWormDefault.position);
             return new ShootCommand(direction);
         }
+
+        // Select Command
+        /*
+        for (Worm pWorm : gameState.myPlayer.worms) {
+            enemyWormDefault = getFirstWormInRange(pWorm);
+            if (pWorm.id != currentWorm.id && enemyWormDefault != null) {
+                Direction direction = resolveDirection(pWorm.position, enemyWormDefault.position);
+                return new SelectCommand(pWorm.id, createCommandShoot(direction));
+            }
+        }
+        */
+
         //Me list surrounding block, terus mencari block mana yg pathnya paling pendek
         List<Cell> surroundingBlocks = getSurroundingCells(currentWorm.position.x, currentWorm.position.y);
         Cell block = findNextCellInPath(surroundingBlocks, enemyWorm.position.x, enemyWorm.position.y);
@@ -98,8 +108,9 @@ public class Bot {
         return surroundingBlocks.get(pathDistance.indexOf(Collections.min(pathDistance)));
     }
 
-    private Worm getFirstWormInRange() {
-        Set<String> cells = constructFireDirectionLines(currentWorm.weapon.range)
+    
+    private Worm getFirstWormInRange(MyWorm playerWorm) {
+        Set<String> cells = constructFireDirectionLines(playerWorm, playerWorm.weapon.range)
                 .stream()
                 .flatMap(Collection::stream)
                 .map(cell -> String.format("%d_%d", cell.x, cell.y))
@@ -115,6 +126,7 @@ public class Bot {
         return null;
     }
 
+    // Reverted
     private Worm getNearestWormInRadius(Worm w, int radius) {
         //get nearest worm
         List<Integer> wormsRange = new ArrayList<>(); //Jarak worm musuh dengan current worm
@@ -146,7 +158,7 @@ public class Bot {
         else{
             range=currentWorm.weapon.range;
         }
-        Set<String> cells = constructFireDirectionLines(range)
+        Set<String> cells = constructFireDirectionLines(currentWorm, range)
                 .stream()
                 .flatMap(Collection::stream)
                 .map(cell -> String.format("%d_%d", cell.x, cell.y))
@@ -177,20 +189,21 @@ public class Bot {
         return enemyWorms.get(wormsRange.indexOf(Collections.min(wormsRange)));
     }
 
-    private List<List<Cell>> constructFireDirectionLines(int range) {
+
+    private List<List<Cell>> constructFireDirectionLines(MyWorm playerWorm, int range) {
         List<List<Cell>> directionLines = new ArrayList<>();
         for (Direction direction : Direction.values()) {
             List<Cell> directionLine = new ArrayList<>();
             for (int directionMultiplier = 1; directionMultiplier <= range; directionMultiplier++) {
 
-                int coordinateX = currentWorm.position.x + (directionMultiplier * direction.x);
-                int coordinateY = currentWorm.position.y + (directionMultiplier * direction.y);
+                int coordinateX = playerWorm.position.x + (directionMultiplier * direction.x);
+                int coordinateY = playerWorm.position.y + (directionMultiplier * direction.y);
 
                 if (!isValidCoordinate(coordinateX, coordinateY)) {
                     break;
                 }
 
-                if (euclideanDistance(currentWorm.position.x, currentWorm.position.y, coordinateX, coordinateY) > range) {
+                if (euclideanDistance(playerWorm.position.x, playerWorm.position.y, coordinateX, coordinateY) > range) {
                     break;
                 }
 
