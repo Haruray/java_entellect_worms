@@ -62,7 +62,20 @@ public class Bot {
         }
         return targets;
     }
-
+    
+    private String createCommandShoot(Direction direction){
+        return String.format(";shoot %s", direction.name());
+    }
+    private String createCommandBananaBomb(int x, int y){
+        return String.format(";banana %d %d", x, y);
+    }
+    private String createCommandSnowball(int x, int y){
+        return String.format(";snowball %d %d", x, y);
+    }
+    //HOW TO USE SELECT COMMAND
+    //CONTOH :
+    //return new SelectCommand(wormID, createCommandShoot(direction);
+    
     public Command run() {
         //Mencari worm musuh terdekat
         /*Worm enemyWorm = getNearestWorm();
