@@ -126,6 +126,11 @@ public class Bot {
                 }
             }
         }   
+        Worm enemyWormDefault = getFirstWormInRange(currentWorm); //Ini mendetect worm musuh pakai fungsi bawaan, biar menghindari weird error
+        if (enemyWormDefault != null){ //Kalau ada musuh disekitar, maka bisa ditembak. Berlaku ke semua jenis worm/this is the default command
+            Direction direction = resolveDirection(currentWorm.position, enemyWormDefault.position);
+            return new ShootCommand(direction);
+        }
         //Me list surrounding block, terus mencari block mana yg pathnya paling pendek
         List<Cell> surroundingBlocks = getSurroundingCells(currentWorm.position.x, currentWorm.position.y);
         for (int i = 0; i < targets.size(); i++){
