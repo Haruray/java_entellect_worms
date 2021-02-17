@@ -32,20 +32,20 @@ public class Bot {
                 .get();
     }
 
-    private boolean canBananaBombThem(Worm target){
-        //Check if currentWorm can cast bananabomb
-        if (currentWorm.id!=2){
+    private boolean canBananaBombThem(MyWorm playerWorm, Worm target){
+        //Check if playerWorm can cast bananabomb
+        if (playerWorm.id!=2){
             return false;
         }
-        return (currentWorm.bananaBombs.count>0 && euclideanDistance(target.position.x, target.position.y, currentWorm.position.x, currentWorm.position.y) <= currentWorm.bananaBombs.range && euclideanDistance(target.position.x, target.position.y, currentWorm.position.x, currentWorm.position.y) > currentWorm.bananaBombs.damageRadius * 0.75);
+        return (playerWorm.bananaBombs.count>0 && euclideanDistance(target.position.x, target.position.y, playerWorm.position.x, playerWorm.position.y) <= playerWorm.bananaBombs.range && euclideanDistance(target.position.x, target.position.y, playerWorm.position.x, playerWorm.position.y) > playerWorm.bananaBombs.damageRadius * 0.75);
     }
 
-    private boolean canSnowballThem(Worm target){
-        //Check if currentworm can cast snowball
-        if (currentWorm.id!=3){
+    private boolean canSnowballThem(MyWorm playerWorm, Worm target){
+        //Check if playerWorm can cast snowball
+        if (playerWorm.id!=3){
             return false;
         }
-        return (currentWorm.snowballs.count>0 && euclideanDistance(target.position.x, target.position.y, currentWorm.position.x, currentWorm.position.y) <= currentWorm.snowballs.range && euclideanDistance(target.position.x, target.position.y, currentWorm.position.x, currentWorm.position.y) > currentWorm.snowballs.freezeRadius * Math.sqrt(2) && target.roundsUntilUnfrozen<=0);
+        return (playerWorm.snowballs.count>0 && euclideanDistance(target.position.x, target.position.y, playerWorm.position.x, playerWorm.position.y) <= playerWorm.snowballs.range && euclideanDistance(target.position.x, target.position.y, playerWorm.position.x, playerWorm.position.y) > playerWorm.snowballs.freezeRadius * Math.sqrt(2) && target.roundsUntilUnfrozen<=0);
     }
 
     private List<Worm> designate_target(){
@@ -90,14 +90,12 @@ public class Bot {
 
         for (int i = 0; i < targets.size(); i++){
             Worm enemyWorm = targets.get(i);
-            Worm secondWormInBBRadius = getNearestWormInRadius(enemyWorm, 2);
-            Worm secondWormInSBRadius = getNearestWormInRadius(enemyWorm, 1);
-            if (canBananaBombThem(enemyWorm) && secondWormInBBRadius != null){  //Jika bisa di bananabomb, maka langsung dibananabomb
-            return new BananaBombCommand(enemyWorm.position.x, enemyWorm.position.y);
-        }
-            if (canSnowballThem(enemyWorm) && secondWormInSBRadius != null){ //Jika bisa di snowball, maka langsung di snowbomb
-            return new SnowballCommand(enemyWorm.position.x, enemyWorm.position.y);
-        }
+            if (canBananaBombThem(currentWorm, enemyWorm)){  //Jika bisa di bananabomb, maka langsung dibananabomb
+                return new BananaBombCommand(enemyWorm.position.x, enemyWorm.position.y);
+            }
+            if (canSnowballThem(currentWorm, enemyWorm)){ //Jika bisa di snowball, maka langsung di snowbomb
+                return new SnowballCommand(enemyWorm.position.x, enemyWorm.position.y);
+            }
     }
         // Select Command
         if (selectToken > 0) {
@@ -119,7 +117,7 @@ public class Bot {
                         }
                     }
                     */
-                    enemyWormDefault = getFirstWormInRange(pWorm);
+                    Worm enemyWormDefault = getFirstWormInRange(pWorm);
                     if (enemyWormDefault != null) {
                         Direction direction = resolveDirection(pWorm.position, enemyWormDefault.position);
                         selectToken -= 1;
