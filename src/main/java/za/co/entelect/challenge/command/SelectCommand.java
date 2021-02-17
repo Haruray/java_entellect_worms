@@ -12,6 +12,6 @@ public class SelectCommand implements Command {
 
     @Override
     public String render() {
-        return String.format("select %d "+y, x);
+        return String.format("select %d"+y, x);
     }
 }
