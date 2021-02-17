@@ -224,13 +224,24 @@ public class Bot {
         return directionLines;
     }
 
+    private boolean isOccupied(Cell cell){
+        for (int i=0;i<gameState.myPlayer.worms.length;i++){
+            if (cell.x==gameState.myPlayer.worms[i].position.x && cell.y==gameState.myPlayer.worms[i].position.y){
+                return true;
+            }
+        }
+        return false;
+    }
+
     private List<Cell> getSurroundingCells(int x, int y) {
         ArrayList<Cell> cells = new ArrayList<>();
         for (int i = x - 1; i <= x + 1; i++) {
             for (int j = y - 1; j <= y + 1; j++) {
                 // Don't include the current position
                 if (i != x && j != y && isValidCoordinate(i, j)) {
-                    cells.add(gameState.map[j][i]);
+                    if (!isOccupied(gameState.map[j][i])) {
+                        cells.add(gameState.map[j][i]);
+                    }
                 }
             }
         }
