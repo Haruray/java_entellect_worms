@@ -10,13 +10,12 @@ import java.util.stream.Collectors;
 
 public class Bot {
 
-    private Random random;
     private GameState gameState;
     private Opponent opponent;
     private MyWorm currentWorm;
+    static int selectToken = 5;
 
-    public Bot(Random random, GameState gameState) {
-        this.random = random;
+    public Bot(GameState gameState) {
         this.gameState = gameState;
         this.opponent = gameState.opponents[0];
         this.currentWorm = getCurrentWorm(gameState);
@@ -60,7 +59,7 @@ public class Bot {
     
     public Command run() {
         //Mencari worm musuh terdekat
-        Worm enemyWorm = getNearestWorm();
+        Worm enemyWorm = getNearestWorm(currentWorm);
 
         if (canBananaBombThem(currentWorm, enemyWorm)){  //Jika bisa di bananabomb, maka langsung dibananabomb
             return new BananaBombCommand(enemyWorm.position.x, enemyWorm.position.y);
@@ -75,15 +74,34 @@ public class Bot {
         }
 
         // Select Command
-        /*
-        for (Worm pWorm : gameState.myPlayer.worms) {
-            enemyWormDefault = getFirstWormInRange(pWorm);
-            if (pWorm.id != currentWorm.id && enemyWormDefault != null) {
-                Direction direction = resolveDirection(pWorm.position, enemyWormDefault.position);
-                return new SelectCommand(pWorm.id, createCommandShoot(direction));
+        if (selectToken > 0) {
+            for (MyWorm pWorm : gameState.myPlayer.worms) {
+                if (pWorm.id != currentWorm.id) {
+                    /*
+                    if (pWorm.id == 2) {
+                        enemyWorm = getNearestWorm(pWorm);
+                        if (canBananaBombThem(pWorm, enemyWorm)) {
+                            selectToken -= 1;
+                            return new SelectCommand(pWorm.id, createCommandBananaBomb(enemyWorm.position.x, enemyWorm.position.y));
+                        }
+                    }
+                    if (pWorm.id == 3) {
+                        enemyWorm = getNearestWorm(pWorm);
+                        if (canBananaBombThem(pWorm, enemyWorm)) {
+                            selectToken -= 1;
+                            return new SelectCommand(pWorm.id, createCommandSnowball(enemyWorm.position.x, enemyWorm.position.y));
+                        }
+                    }
+                    */
+                    enemyWormDefault = getFirstWormInRange(pWorm);
+                    if (enemyWormDefault != null) {
+                        Direction direction = resolveDirection(pWorm.position, enemyWormDefault.position);
+                        selectToken -= 1;
+                        return new SelectCommand(pWorm.id, createCommandShoot(direction));
+                    }
+                }
             }
-        }
-        */
+        }   
 
         //Me list surrounding block, terus mencari block mana yg pathnya paling pendek
         List<Cell> surroundingBlocks = getSurroundingCells(currentWorm.position.x, currentWorm.position.y);
@@ -126,64 +144,15 @@ public class Bot {
         return null;
     }
 
-    // Reverted
-    private Worm getNearestWormInRadius(Worm w, int radius) {
-        //get nearest worm
-        List<Integer> wormsRange = new ArrayList<>(); //Jarak worm musuh dengan current worm
-        List<Worm> enemyWorms = new ArrayList<>(); //List worm musuh
-        for (Worm enemyWorm : opponent.worms) {
-            if (enemyWorm.health > 0 && enemyWorm.id != w.id && euclideanDistance(w.position.x, w.position.y, enemyWorm.position.x, enemyWorm.position.y) <= radius) {
-                enemyWorms.add(enemyWorm);
-                wormsRange.add(euclideanDistance(w.position.x, w.position.y, enemyWorm.position.x, enemyWorm.position.y));
 
-            }
-        }
-        if (!enemyWorms.isEmpty()) {
-            return enemyWorms.get(wormsRange.indexOf(Collections.min(wormsRange)));
-        } else {
-            return null;
-        }
-    }
-
-    private List<Worm> getWormsInRange(){
-        //JANGAN DIPAHAMI, INI BELUM BISA DIPAKAI
-        List<Worm> nearbyWorms = new ArrayList<>();
-        int range;
-        if (currentWorm.id==2){
-            range=currentWorm.bananaBombs.range;
-        }
-        else if (currentWorm.id==3){
-            range=currentWorm.snowballs.range;
-        }
-        else{
-            range=currentWorm.weapon.range;
-        }
-        Set<String> cells = constructFireDirectionLines(currentWorm, range)
-                .stream()
-                .flatMap(Collection::stream)
-                .map(cell -> String.format("%d_%d", cell.x, cell.y))
-                .collect(Collectors.toSet());
-
-        for (Worm enemyWorm : opponent.worms) {
-            String enemyPosition = String.format("%d_%d", enemyWorm.position.x, enemyWorm.position.y);
-            if (cells.contains(enemyPosition)) {
-                nearbyWorms.add(enemyWorm);
-            }
-        }
-        if (nearbyWorms!=null){
-            return nearbyWorms;
-        }
-        return null;
-    }
-
-    private Worm getNearestWorm(){
+    private Worm getNearestWorm(MyWorm playerWorm){
         //get nearest worm
         List<Integer> wormsRange = new ArrayList<>(); //Jarak worm musuh dengan current worm
         List<Worm> enemyWorms = new ArrayList<>(); //List worm musuh
         for (Worm enemyWorm : opponent.worms){
             if (enemyWorm.health>0) { //Syaratnya worm musuh harus hidup
                 enemyWorms.add(enemyWorm);
-                wormsRange.add(euclideanDistance(currentWorm.position.x, currentWorm.position.y, enemyWorm.position.x, enemyWorm.position.y));
+                wormsRange.add(euclideanDistance(playerWorm.position.x, playerWorm.position.y, enemyWorm.position.x, enemyWorm.position.y));
             }
         }
         return enemyWorms.get(wormsRange.indexOf(Collections.min(wormsRange)));
