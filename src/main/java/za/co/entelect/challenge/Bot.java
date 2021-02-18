@@ -76,7 +76,7 @@ public class Bot {
         // Select Command
         if (selectToken > 0) {
             for (MyWorm pWorm : gameState.myPlayer.worms) {
-                if (pWorm.id != currentWorm.id) {
+                if (pWorm.id != currentWorm.id && pWorm.health > 0) {
                     /*
                     if (pWorm.id == 2) {
                         enemyWorm = getNearestWorm(pWorm);
