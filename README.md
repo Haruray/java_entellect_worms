@@ -36,4 +36,4 @@ Dengan cara memindahkan "match-logs" pada "starter-pack" ke folder "Matches" pad
 2. Safiq Faray - 13519145
 3. Muhammad Iqbal Sigid - 13519152
 
-"read hnk" -sultanh
+"read hnk" -someone
