@@ -14,7 +14,9 @@ Entellect game engine : https://github.com/EntelectChallenge/2019-Worms/releases
 ## Building
 
 Setelah clone repository, buka project pada IntelliJ IDEA.
+
 Package bot dengan cara membuka Maven Projects pada bagian kanan layar IntelliJ IDEA. Double click "java-sample-bot" > "Lifecycle" > "Install".
+
 Ini akan membuat .jar file pada folder "target" dengan nama file "java-sample-bot-jar-with-dependencies.jar".
 
 ## Running 
@@ -24,6 +26,7 @@ Buka "run.bat"
 
 Untuk visualisasi dapat menggunakan visualizer pada link berikut
 https://github.com/dlweatherhead/entelect-challenge-2019-visualiser/releases/tag/v1.0f1
+
 Dengan cara memindahkan "match-logs" pada "starter-pack" ke folder "Matches" pada visualizer, kemudian jalankan visualizer.
 
 ## Author
