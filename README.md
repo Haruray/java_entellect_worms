@@ -1,4 +1,4 @@
-# Read HNK's Greedy Algoritm Worm Bot
+# Read HNK's Greedy Algorithm Worm Bot
 
 ## Algoritma
 Algoritma yang digunakan pada bot ini adalah greedy algoritm dengan strategi Greedy by Position untuk penentuan worm target serta Greedy by Damage untuk penentuan aksi. Worm permain akan mendekati worm musuh terdekat sampai mencapai attack range kemudian akan menyerang worm musuh.
