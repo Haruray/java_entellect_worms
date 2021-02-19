@@ -1,20 +1,36 @@
-# Java starter bot
+# Read HNK's Greedy Algoritm Worm Bot
 
-## Environment requirements
+## Algoritma
+Algoritma yang digunakan pada bot ini adalah greedy algoritm dengan strategi Greedy by Position untuk penentuan worm target serta Greedy by Damage untuk penentuan aksi. Worm permain akan mendekati worm musuh terdekat sampai mencapai attack range kemudian akan menyerang worm musuh.
 
-Install the Java SE Development Kit 8 for your environment here: http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
+## Environment Requirements
 
-Make sure JAVA_HOME system variable is set, Windows 10 tutorial here: https://www.mkyong.com/java/how-to-set-java_home-on-windows-10/
+Java SE Development Kit 8 : http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
 
-Install IntelliJ IDEA here: https://www.jetbrains.com/idea/download/
-The community edition is free.
+IntelliJ IDEA : https://www.jetbrains.com/idea/download/
+
+Entellect game engine : https://github.com/EntelectChallenge/2019-Worms/releases/tag/2019.3.2
 
 ## Building
 
-Make your modifications to the starter bot using IntelliJ. Once you are happy with your changes, package your bot by opening up the "Maven Projects" tab on the right side of the screen. From here go to the  "java-sample-bot" > "Lifecycle" group and double-click "Install"
-This  will create a .jar file in the folder called "target". The file will be called "java-sample-bot-jar-with-dependencies.jar".
+Setelah clone repository, buka project pada IntelliJ IDEA.
+Package bot dengan cara membuka Maven Projects pada bagian kanan layar IntelliJ IDEA. Double click "java-sample-bot" > "Lifecycle" > "Install".
+Ini akan membuat .jar file pada folder "target" dengan nama file "java-sample-bot-jar-with-dependencies.jar".
 
 ## Running 
 
-To run the bot, copy the file "java-sample-bot-jar-with-dependencies.jar" to a different location. Then go to the starter-pack and edit the config.json file accordingly.
-Then run the "run.bat" file on windows or the "run.sh" file for unix.
+Ubah path player-a pada file "game-runner-config.json" menjadi lokasi folder bot.
+Buka "run.bat"
+
+Untuk visualisasi dapat menggunakan visualizer pada link berikut
+https://github.com/dlweatherhead/entelect-challenge-2019-visualiser/releases/tag/v1.0f1
+Dengan cara memindahkan "match-logs" pada "starter-pack" ke folder "Matches" pada visualizer, kemudian jalankan visualizer.
+
+## Author
+
+### Read HNK
+1. Muhammad Galih Raihan Ramadhan - 13519017
+2. Safiq Faray - 13519145
+3. Muhammad Iqbal Sigid - 13519152
+
+"read hnk" -sultanh
